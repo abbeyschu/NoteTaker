@@ -18,7 +18,6 @@ app.use(express.static(path.join(__dirname,'public')));
 // Starts the server to begin listening
 app.listen(PORT, () => console.log(`App listening on PORT ${PORT}`));
 
-
 // => HTML GET Requests  
 app.get('/', (req, res) => res.sendFile(path.join(__dirname,'./public/index.html')));
 
@@ -27,31 +26,22 @@ app.get('/notes', (req, res) => res.sendFile(path.join(__dirname,'./public/notes
 // If no matching route is found default to home
 app.get('*', (req, res) => res.sendFile(path.join(__dirname,'./public/index.html')));
 
+
     // API GET Requests  
-    // const notes = './Develop/db/db.json';
-    // app.get('/api/notes', (req, res) => {
-    //     fs.readFile(notes, (err, data) => {
-    //         if (err) throw err;
-    //         db = JSON.parse(data);
-    //         res.send(db);
-    //       });
-    // });
+const notes = require(__dirname + '/db/db.json');
+app.get('/api/notes', (req, res) => res.json(notes));
   
     // API POST Requests
-    // app.post('/api/notes', (req, res) => {
-    //     fs.readFile(notes, (err,data) => {
-    //         if (err) throw err;
-    //         db = JSON.parse(data);
-    //         db.push(req.body);
-    //         for (let i = 0; i < db.length; i++) {
-    //             let id = 1;
-    //             db.id = id;
-    //             id++;
-    //             return res.json(db[i]);
-    //         };
-    //         fs.writeFile(notes, db, (err, data) => {
-    //             if (err) throw err;
-    //           });
-    //         });
-    //     });
-      
+app.post('/api/notes', (req, res) => {
+    notes.push(req.body);
+    let id = 1;
+    notes.forEach((note)=>{
+        note.id = id;
+        id++;
+        return notes;
+    });
+    fs.writeFile('db/db.json', JSON.stringify(notes), (err) => {
+        if (err) throw err;
+    });
+    res.end();
+});
